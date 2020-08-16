@@ -11,7 +11,18 @@ import re
 import pandas as pd
 import urllib.request
 from datetime import date
+from tqdm import tqdm
 
+class DownloadProgressBar(tqdm):
+    def update_to(self, b=1, bsize=1, tsize=None):
+        if tsize is not None:
+            self.total = tsize
+        self.update(b * bsize - self.n)
+
+def download_url(url, output_path):
+    with DownloadProgressBar(unit='B', unit_scale=True,
+                             miniters=1, desc=url.split('/')[-1]) as t:
+        urllib.request.urlretrieve(url, filename=output_path, reporthook=t.update_to)
 
 def extract_filename(date_sg):
     '''
@@ -60,7 +71,7 @@ def download(filename):
         try:
             url = link+filename
             print('Beginning file download with urllib2...')
-            urllib.request.urlretrieve(url,'rawdata.xml')
+            download_url(url,'rawdata.xml')
             parsed_data = etree.parse('rawdata.xml')
             print('File downloaded')
             return parsed_data
@@ -68,7 +79,7 @@ def download(filename):
             print('file not downloaded or parsed')
             return 0
 
-def check_parse(filename):
+def check_parse(date_sg):
     '''
     checks if file exists otherwise call download
 
@@ -83,6 +94,8 @@ def check_parse(filename):
 
     '''
     import os.path
+    filename = extract_filename(date_sg)
+    
     #if internet not working try to parse the local file if it exists
     if filename == 'filename not found':
         print('internet not working')
@@ -107,8 +120,8 @@ def check_parse(filename):
             revnumber = parsed_data.find('RevisionNo').text
             latest_rev = re.findall('[0-9]+',filename)[0]
             flag = (revnumber == latest_rev)
-            print('latest_rev is: ', latest_rev)
-            print('existing rev is: ', revnumber)
+            print('\nlatest_rev is: ', latest_rev)
+            print('existing rev is: ', revnumber,'\n')
         except:
             print('parse error')
             flag = 0 #needs downloading
@@ -139,7 +152,7 @@ def block_time():
     y = pd.DataFrame(stop,columns=['block_stop'])
     return pd.concat([x,y],axis=1).transpose()
 
-def get_revision(parsed_data):
+def get_revision():
     revnumber = [(parsed_data.find('RevisionNo').text)]
     revtime = parsed_data.find('createdOn').text.split('T')
     revision = pd.DataFrame({'revnumber':revnumber,
@@ -147,10 +160,6 @@ def get_revision(parsed_data):
                             'revtime':revtime[1]}).transpose()
     return revision
 
-def get_parsed_data(date_sg):
-    filename = extract_filename(date_sg)
-    parsed_data = check_parse(filename)
-    return parsed_data
 
 class station(object):
     
@@ -208,15 +217,12 @@ class station(object):
         dc_sg = dc.append(sg)
         return dc_sg
 
-#set date as today                    
+#set date as today or any date                  
 date_sg = int(date.today().strftime("%d"))
-parsed_data = get_parsed_data(date_sg)
-revision = get_revision(parsed_data)
-
+parsed_data = check_parse(date_sg)
 
 def main():
     try:
-
         gf = station('DADRI_GF')        
         rf = station('DADRI_RF')
         crf = station('DADRI_CRF')
@@ -229,13 +235,15 @@ def main():
 
         total = round((g+r+c+l),2)
         blocktime = block_time()
+        
         stationlist = ['DADRI_GF','DADRI_RF','DADRI_CRF','DADRI_LF',
                     'Total','Block_time','Revision']  
-                
+        
+        revision = get_revision()
+        
         dgps = pd.concat([g,r,c,l,total,blocktime,revision],
                         keys = stationlist).transpose()
         print(dgps)
-        
         dgps.to_csv('dgps.csv')
 
     except:
