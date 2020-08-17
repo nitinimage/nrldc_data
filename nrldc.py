@@ -4,6 +4,8 @@
 Created on Tue Aug 11 19:43:20 2020
 
 @author: image
+
+This script gives you a csv file with the latest nrldc dc sg data
 """
 
 import xml.etree.ElementTree as etree
@@ -40,6 +42,7 @@ def extract_filename(date_sg):
     '''
     try:
         link = 'http://wbes.nrldc.in/xml/'
+        print('fetching latest filename from wbes.nrldc.in/xml/\n')
         x = pd.read_html(link)
         y = 0
         flag = 0
