@@ -14,6 +14,7 @@ import pandas as pd
 import urllib.request
 from datetime import date
 from tqdm import tqdm
+import time
 
 class DownloadProgressBar(tqdm):
     def update_to(self, b=1, bsize=1, tsize=None):
@@ -225,33 +226,38 @@ date_sg = int(date.today().strftime("%d"))
 parsed_data = check_parse(date_sg)
 
 def main():
-    try:
-        gf = station('DADRI_GF')        
-        rf = station('DADRI_RF')
-        crf = station('DADRI_CRF')
-        lf = station('DADRI_LF') 
+    # while True:
+        try:
+            gf = station('DADRI_GF')        
+            rf = station('DADRI_RF')
+            crf = station('DADRI_CRF')
+            lf = station('DADRI_LF') 
+            
+            g = gf.get_dc_sg()
+            r = rf.get_dc_sg()
+            c = crf.get_dc_sg()
+            l = lf.get_dc_sg()
+    
+            total = round((g+r+c+l),2)
+            blocktime = block_time()
+            
+            stationlist = ['DADRI_GF','DADRI_RF','DADRI_CRF','DADRI_LF',
+                        'Total','Block_time','Revision']  
+            
+            revision = get_revision()
+            
+            dgps = pd.concat([g,r,c,l,total,blocktime,revision],
+                            keys = stationlist).transpose()
+            print(dgps)
+            dgps.to_csv('dgps.csv')
+    
+        except:
+            print('something wrong...Try again')
+        # time.sleep(10)
+        # date_sg = int(date.today().strftime("%d"))
+        # global parsed_data 
+        # parsed_data = check_parse(date_sg)
         
-        g = gf.get_dc_sg()
-        r = rf.get_dc_sg()
-        c = crf.get_dc_sg()
-        l = lf.get_dc_sg()
-
-        total = round((g+r+c+l),2)
-        blocktime = block_time()
-        
-        stationlist = ['DADRI_GF','DADRI_RF','DADRI_CRF','DADRI_LF',
-                    'Total','Block_time','Revision']  
-        
-        revision = get_revision()
-        
-        dgps = pd.concat([g,r,c,l,total,blocktime,revision],
-                        keys = stationlist).transpose()
-        print(dgps)
-        dgps.to_csv('dgps.csv')
-
-    except:
-        print('something wrong...Try again')
-
 if __name__ == "__main__":
     main()
 
