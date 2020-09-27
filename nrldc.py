@@ -143,15 +143,18 @@ def block_time():
         block start and stop times.
 
     '''
+    # blocknumber=[]
     start = []
     stop = []
     for i in range(96):
+        # blocknumber.append(i+1)
         if not i%4:
             start.append(str(i//4).zfill(2)+':00')
         else:
             start.append(str(i//4).zfill(2)+':'+str(15*(i%4)))
     stop = start[1:]+[start[0]]
     
+    # n = pd.DataFrame(blocknumber,columns=['block_number'])
     x = pd.DataFrame(start,columns=['block_start'])
     y = pd.DataFrame(stop,columns=['block_stop'])
     return pd.concat([x,y],axis=1).transpose()
@@ -163,6 +166,33 @@ def get_revision():
                             'revdate':revtime[0],
                             'revtime':revtime[1]}).transpose()
     return revision
+
+def display(df, output_filename):
+    '''takes dataframe as input and displays as html'''
+    
+    print(df)
+    df.to_csv(f"{output_filename}.csv",na_rep='')
+    # df.to_html(f"{output_filename}.html",na_rep='',classes='mystyle')
+    
+    
+    pd.set_option('colheader_justify', 'center')   # FOR TABLE <th>
+    
+    html_string = '''
+        <html>
+          <head>
+              <title>DGPS DC SG </title>
+          </head>
+          <script src="df_script.js"></script>
+          <link rel="stylesheet" type="text/css" href="df_style.css"/>
+          <body>
+            {table}
+          </body>
+        </html>
+        '''
+    
+    # OUTPUT AN HTML FILE
+    with open(f"{output_filename}.html", 'w') as f:
+        f.write(html_string.format(table=df.to_html(na_rep='', classes='mystyle')))
 
 
 class station(object):
@@ -192,9 +222,9 @@ class station(object):
         return pd.DataFrame(schedule, index=buyer)
     
     def extract_dc(self):       
-        term = ['DeclaredAmount',
-                'OffBarDC',
-                'DeclarationOnBar']
+        term = ['Total DC',
+                'OffBar DC',
+                'OnBar DC']
         dc = []
         dclist = parsed_data.findall('lstDeclaration/Declaration')
         for i in dclist: 
@@ -217,7 +247,7 @@ class station(object):
     def get_dc_sg(self):
         dc = self.extract_dc()
         sg = round(self.extract_sg().sum(),2)
-        sg.name = 'Schedule'
+        sg.name = 'SG'
         dc_sg = dc.append(sg)
         return dc_sg
 
@@ -241,16 +271,20 @@ def main():
             total = round((g+r+c+l),2)
             blocktime = block_time()
             
-            stationlist = ['DADRI_GF','DADRI_RF','DADRI_CRF','DADRI_LF',
-                        'Total','Block_time','Revision']  
+            stationlist = ['Block_time','DGPS_Total',
+                           'DADRI_GF','DADRI_CRF',
+                           'DADRI_RF','DADRI_LF',
+                           'Revision']  
             
             revision = get_revision()
             
-            dgps = pd.concat([g,r,c,l,total,blocktime,revision],
+            dgps = pd.concat([blocktime,total,g,c,r,l,revision],
                             keys = stationlist).transpose()
-            print(dgps)
-            dgps.to_csv('dgps.csv')
-    
+            dgps.index = list(range(1,97))
+            
+            # display output
+            display(dgps, 'dgps')
+
         except:
             print('something wrong...Try again')
         # time.sleep(10)
