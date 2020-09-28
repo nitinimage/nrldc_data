@@ -215,7 +215,7 @@ class station(object):
     def text_to_float(self,x):
         '''x is a list
         '''
-        return [round(float(each),2) for each in x] 
+        return [round(float(each),0) for each in x] 
 
     def extract_sg(self):
         term = 'ScheduleAmount'
@@ -257,7 +257,7 @@ class station(object):
     
     def get_dc_sg(self):
         dc = self.extract_dc()
-        sg = round(self.extract_sg().sum(),2)
+        sg = round(self.extract_sg().sum(),0)
         sg.name = 'SG'
         dc_sg = dc.append(sg)
         return dc_sg
@@ -279,7 +279,7 @@ def main():
             c = crf.get_dc_sg()
             l = lf.get_dc_sg()
     
-            total = round((g+r+c+l),2)
+            total = round((g+r+c+l),0)
             blocktime = block_time()
             
             stationlist = ['Block_time','DGPS_Total',
