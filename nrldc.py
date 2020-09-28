@@ -140,36 +140,41 @@ def block_time():
     Returns
     -------
     dataframe
-        block start and stop times.
+        block Start and End times.
 
     '''
     # blocknumber=[]
-    start = []
-    stop = []
+    Start = []
+    End = []
     for i in range(96):
         # blocknumber.append(i+1)
         if not i%4:
-            start.append(str(i//4).zfill(2)+':00')
+            Start.append(str(i//4).zfill(2)+':00')
         else:
-            start.append(str(i//4).zfill(2)+':'+str(15*(i%4)))
-    stop = start[1:]+[start[0]]
+            Start.append(str(i//4).zfill(2)+':'+str(15*(i%4)))
+    End = Start[1:]+[Start[0]]
     
     # n = pd.DataFrame(blocknumber,columns=['block_number'])
-    x = pd.DataFrame(start,columns=['block_start'])
-    y = pd.DataFrame(stop,columns=['block_stop'])
+    x = pd.DataFrame(Start,columns=['Start'])
+    y = pd.DataFrame(End,columns=['End'])
     return pd.concat([x,y],axis=1).transpose()
 
 def get_revision():
-    revnumber = [(parsed_data.find('RevisionNo').text)]
+    revnumber = parsed_data.find('RevisionNo').text
     revtime = parsed_data.find('createdOn').text.split('T')
-    revision = pd.DataFrame({'revnumber':revnumber,
-                            'revdate':revtime[0],
-                            'revtime':revtime[1]}).transpose()
-    return revision
+    # revision = pd.DataFrame({'revnumber':revnumber,
+    #                         'revdate':revtime[0],
+    #                         'revtime':revtime[1]}).transpose()
+    #revtime.append(revnumber)
+    revdate = revtime[0].split('-')
+    issuedon = f"{revdate[2]}-{revdate[1]}-{revdate[0]}  {revtime[1]}"
+    return [revnumber,issuedon]
 
 def display(df, output_filename):
     '''takes dataframe as input and displays as html'''
     
+    rev = get_revision()
+
     print(df)
     df.to_csv(f"{output_filename}.csv",na_rep='')
     # df.to_html(f"{output_filename}.html",na_rep='',classes='mystyle')
@@ -185,6 +190,9 @@ def display(df, output_filename):
           <script src="df_script.js"></script>
           <link rel="stylesheet" type="text/css" href="df_style.css"/>
           <body>
+            <div> <h1 id=rev >Revision no. {revno} &nbsp;&nbsp;&nbsp; 
+            Issued on: {revtime} 
+            </h1></div>
             {table}
           </body>
         </html>
@@ -192,7 +200,10 @@ def display(df, output_filename):
     
     # OUTPUT AN HTML FILE
     with open(f"{output_filename}.html", 'w') as f:
-        f.write(html_string.format(table=df.to_html(na_rep='', classes='mystyle')))
+        f.write(html_string.format
+                (table=df.to_html(na_rep='', classes='mystyle'),
+                                   revno=rev[0],
+                                   revtime=rev[1]))
 
 
 class station(object):
@@ -273,12 +284,12 @@ def main():
             
             stationlist = ['Block_time','DGPS_Total',
                            'DADRI_GF','DADRI_CRF',
-                           'DADRI_RF','DADRI_LF',
-                           'Revision']  
+                           'DADRI_RF','DADRI_LF'
+                           ]  
             
-            revision = get_revision()
+            # revision = get_revision()
             
-            dgps = pd.concat([blocktime,total,g,c,r,l,revision],
+            dgps = pd.concat([blocktime,total,g,c,r,l],
                             keys = stationlist).transpose()
             dgps.index = list(range(1,97))
             
