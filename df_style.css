@@ -1,15 +1,10 @@
 
 #rev{
-    font-size: 20pt;
+    font-size: 14pt;
     font: Arial;
     text-align: center;
-    /* position: fixed; */
-    /* left: 50%;
-    transform: translate(-50%, 0);
-    z-index: 1; */
-    /* background-color: white; */
-    
 }
+
 
 .mystyle {
     font-size: 11pt; 
@@ -17,58 +12,51 @@
     border-collapse: collapse; 
     border: 1px solid silver;
     table-layout: fixed;
-    width: 100%;
-    text-align: center;
-    position: relative;
-   
+    width: 96%;
+    text-align: center; 
+    margin-left: 2%;
+    margin-right: 2%;
 }
 
-.mystyle thead{
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background-color: white;
-    width: 100%;
-   
+.mystyle tbody{
+  display: block;
+  overflow-y: scroll;
+  max-height: 600px;
 }
 
-/* .mystyle tbody{
-  position: absolute;
+.mystyle tr{
+  display: table;
   width: 100%;
-} */
-
-.mystyle td, th {
-    padding: 5px;
-    word-wrap: break-word;
+  table-layout: fixed;
 }
+
+.mystyle th, td {
+    padding: 5px;
+}
+
 
 .mystyle tr:nth-child(even) {
-    background: #E0E0E0;
+  background: #E0E0E0;
 }
 
-.mystyle tr:hover {
-    background: silver;
-    cursor: pointer;
+.mystyle td:nth-child(n+2):nth-child(-n+3){
+  font-weight: bold;
 }
 
-
-
-.mystyle td:nth-child(n+8):nth-child(-n+11)
+.mystyle tr:nth-child(even) td:nth-child(n+8):nth-child(-n+11), 
+.mystyle tr:nth-child(even) td:nth-child(n+16):nth-child(-n+19) 
 {
-  background-color: lightyellow;
+  background: rgb(247, 225, 193);  
 }
 
-.mystyle td:nth-child(n+12):nth-child(-n+15)
+.mystyle tr:nth-child(odd) td:nth-child(n+8):nth-child(-n+11), 
+.mystyle tr:nth-child(odd) td:nth-child(n+16):nth-child(-n+19) 
 {
-  background-color: lightblue;
+  background: lightyellow; 
 }
 
-.mystyle td:nth-child(n+16):nth-child(-n+19)
-{
-  background-color: lightyellow;
-}
-
-.mystyle td:nth-child(n+20):nth-child(-n+23)
-{
-  background-color: lightblue;
+.mystyle tr:hover td {
+  background: black !important;
+  color:white;
+  cursor: pointer;
 }
