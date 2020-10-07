@@ -1,0 +1,100 @@
+
+.header{
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.header h1{
+    font-size: 14pt;
+    font: Arial;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.header a{
+  margin-left: 2%;
+}
+
+
+
+.mystyle {
+    font-size: 10pt; 
+    font-family: Arial;
+    border-collapse: collapse; 
+    border: 5px solid silver;
+    table-layout: fixed;
+    width: 96%;
+    text-align: center; 
+    margin-left: 2%;
+    margin-right: 2%;
+}
+
+.mystyle tbody{
+  display: block;
+  overflow-y: scroll;
+  max-height: 600px;
+}
+
+.mystyle tr{
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.mystyle th, td {
+    padding: 5px;
+}
+
+
+.mystyle tr:nth-child(even) {
+  background: #E0E0E0;
+}
+
+.mystyle td:nth-child(n+2):nth-child(-n+3){
+  font-weight: bold;
+}
+
+.mystyle tr:nth-child(even) td:nth-child(n+8):nth-child(-n+11), 
+.mystyle tr:nth-child(even) td:nth-child(n+16):nth-child(-n+19) 
+{
+  background: rgb(247, 225, 193);  
+}
+
+.mystyle tr:nth-child(odd) td:nth-child(n+8):nth-child(-n+11), 
+.mystyle tr:nth-child(odd) td:nth-child(n+16):nth-child(-n+19) 
+{
+  background: lightyellow; 
+}
+
+.mystyle tr:hover td, tbody> tr:hover th
+{
+  background: black !important;
+  color:white;
+  cursor: pointer;
+}
+
+tr:last-child td, tr:nth-last-child(2) td,
+tr:last-child th, tr:nth-last-child(2) th
+{
+  background:lightyellow !important ; 
+  font-weight: bold;
+  border-collapse: collapse;
+
+}
+
+  /* tbody>tr:nth-last-child(2)
+  {
+    display: table;
+    position: fixed;
+    top: 710px;
+    width: 94.95%;
+  }
+
+  tbody>tr:nth-last-child(1)
+  {
+    display: table;
+    position: fixed;
+    top: 737px;
+    width: 94.95%;
+  } */
